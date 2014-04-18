@@ -2,6 +2,7 @@
 Computes the data to display on the Instructor Dashboard
 """
 from util.json_request import JsonResponse
+import json
 
 from courseware import models
 from django.db.models import Count
@@ -34,6 +35,7 @@ def get_problem_grade_distribution(course_id):
     ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
 
     prob_grade_distrib = {}
+    total_student_count = {}
 
     # Loop through resultset building data for each problem
     for row in db_query:
@@ -53,7 +55,10 @@ def get_problem_grade_distribution(course_id):
                 'grade_distrib': [(row['grade'], row['count_grade'])]
             }
 
-    return prob_grade_distrib
+        # Build set of total students attempting each problem
+        total_student_count[curr_problem] = total_student_count.get(curr_problem, 0) + row['count_grade']
+
+    return prob_grade_distrib, total_student_count
 
 
 def get_sequential_open_distrib(course_id):
@@ -136,7 +141,7 @@ def get_d3_problem_grade_distrib(course_id):
       'data' - data for the d3_stacked_bar_graph function of the grade distribution for that problem
     """
 
-    prob_grade_distrib = get_problem_grade_distribution(course_id)
+    prob_grade_distrib, total_student_count = get_problem_grade_distribution(course_id)
     d3_data = []
 
     # Retrieve course object down to problems
@@ -178,19 +183,24 @@ def get_d3_problem_grade_distrib(course_id):
                             for (grade, count_grade) in problem_info['grade_distrib']:
                                 percent = 0.0
                                 if max_grade > 0:
-                                    percent = (grade * 100.0) / max_grade
+                                    percent = round((grade * 100.0) / max_grade, 1)
 
-                                # Construct tooltip for problem in grade distibution view
-                                tooltip = _("{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})").format(
-                                    label=label,
-                                    problem_name=problem_name,
-                                    count_grade=count_grade,
-                                    students=_("students"),
-                                    percent=percent,
-                                    grade=grade,
-                                    max_grade=max_grade,
-                                    questions=_("questions"),
-                                )
+                                # Compute percent of students with this grade
+                                student_count_percent = 0
+                                if total_student_count.get(child.location.url(), 0):
+                                    student_count_percent = count_grade * 100 / total_student_count[child.location.url()]
+
+                                # Tooltip parameters for problem in grade distribution view
+                                tooltip = {
+                                    'type': 'problem',
+                                    'label': label,
+                                    'problem_name': problem_name,
+                                    'count_grade': count_grade,
+                                    'percent': percent,
+                                    'grade': grade,
+                                    'max_grade': max_grade,
+                                    'student_count_percent': student_count_percent,
+                                }
 
                                 # Construct data to be sent to d3
                                 stack_data.append({
@@ -246,11 +256,14 @@ def get_d3_sequential_open_distrib(course_id):
                 num_students = sequential_open_distrib[subsection.location.url()]
 
             stack_data = []
-            tooltip = _("{num_students} student(s) opened Subsection {subsection_num}: {subsection_name}").format(
-                num_students=num_students,
-                subsection_num=c_subsection,
-                subsection_name=subsection_name,
-            )
+
+            # Tooltip parameters for subsection in open_distribution view
+            tooltip = {
+                'type': 'subsection',
+                'num_students': num_students,
+                'subsection_num': c_subsection,
+                'subsection_name': subsection_name
+            }
 
             stack_data.append({
                 'color': 0,
@@ -329,9 +342,8 @@ def get_d3_section_grade_distrib(course_id, section):
             for (grade, count_grade) in grade_distrib[problem]['grade_distrib']:
                 percent = 0.0
                 if max_grade > 0:
-                    percent = (grade * 100.0) / max_grade
+                    percent = round((grade * 100.0) / max_grade, 1)
 
-                # Construct tooltip for problem in grade distibution view
                 tooltip = _("{problem_info_x} {problem_info_n} - {count_grade} {students} ({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})").format(
                     problem_info_x=problem_info[problem]['x_value'],
                     count_grade=count_grade,
@@ -342,6 +354,17 @@ def get_d3_section_grade_distrib(course_id, section):
                     max_grade=max_grade,
                     questions=_("questions"),
                 )
+
+                # Construct tooltip for problem in grade distibution view
+                tooltip = {
+                    'type': 'problem',
+                    'problem_info_x': problem_info[problem]['x_value'],
+                    'count_grade': count_grade,
+                    'percent': percent,
+                    'problem_info_n': problem_info[problem]['display_name'],
+                    'grade': grade,
+                    'max_grade': max_grade,
+                }
 
                 stack_data.append({
                     'color': percent,
@@ -517,6 +540,56 @@ def get_students_problem_grades(request, csv=False):
 
         response = create_csv_response(filename, header, results)
         return response
+
+
+def post_metrics_data_csv(request):
+    """
+    Generate a list of opened subsections or problems for the entire course for CSV download.
+    Returns a header array, and an array of arrays in the format:
+    section, subsection, count of students for subsections
+    or section, problem, name, count of students, percent of students, score for problems.
+    """
+
+    data = json.loads(request.POST['data'])
+    sections = json.loads(data['sections'])
+    tooltips = json.loads(data['tooltips'])
+    course_id = data['course_id']
+    data_type = data['data_type']
+
+    results = []
+    if data_type == 'subsection':
+        header = ['Section', 'Subsection', 'Opened by this number of students']
+        filename = sanitize_filename('subsections_' + course_id)
+    elif data_type == 'problem':
+        header = ['Section', 'Problem', 'Name', 'Count of Students', '% of Students', 'Score']
+        filename = sanitize_filename('problems_' + course_id)
+
+    i = 0
+    for section in sections:
+        results.append([section])
+
+        if data_type == 'subsection':
+            for tooltip_dict in tooltips[i]:
+
+                num_students = tooltip_dict['num_students']
+                subsection = tooltip_dict['subsection_name']
+                results.append(['', subsection, num_students])
+            i += 1
+
+        elif data_type == 'problem':
+            for tooltip in tooltips[i]:
+                for tooltip_dict in tooltip:
+
+                    label = tooltip_dict['label']
+                    problem_name = tooltip_dict['problem_name']
+                    count_grade = tooltip_dict['count_grade']
+                    student_count_percent = tooltip_dict['student_count_percent']
+                    percent = tooltip_dict['percent']
+                    results.append(['', label, problem_name, count_grade, student_count_percent, percent])
+            i += 1
+
+    response = create_csv_response(filename, header, results)
+    return response
 
 
 def sanitize_filename(filename):
