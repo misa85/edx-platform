@@ -946,7 +946,7 @@ def instructor_dashboard(request, course_id):
         'metrics_results': metrics_results,
     }
 
-    context['beta_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_id})
+    context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
