@@ -236,7 +236,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             kwargs=dict(
                 course_id=course_id.to_deprecated_string(),
                 userid=str(user.id),
-                mod_id=descriptor.location.url(),
+                mod_id=descriptor.location.to_deprecated_string(),
                 dispatch=dispatch
             ),
         )
@@ -442,7 +442,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
-            make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
+            make_psychometrics_data_update_handler(course_id, user, descriptor.location.to_deprecated_string())
         )
 
     system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))

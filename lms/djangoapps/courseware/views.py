@@ -249,7 +249,7 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
+        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
     masq = setup_masquerade(request, staff_access)
@@ -418,7 +418,7 @@ def jump_to_id(request, course_id, module_id):
     if len(items) > 1:
         log.warning(
             u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()
+                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
             ))
 
     return jump_to(request, course_id, items[0].location.to_deprecated_string())

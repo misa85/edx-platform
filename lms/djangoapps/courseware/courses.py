@@ -208,7 +208,7 @@ def get_course_about_section(course, section_key):
 
         except ItemNotFoundError:
             log.warning(
-                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.url())
+                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
             )
             return None
     elif section_key == "title":
@@ -293,7 +293,7 @@ def get_course_syllabus_section(course, section_key):
                 )
         except ResourceNotFoundError:
             log.exception(
-                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.url())
+                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
             )
             return "! Syllabus missing !"
 

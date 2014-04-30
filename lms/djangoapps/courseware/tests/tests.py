@@ -86,7 +86,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             else:
 
                 kwargs = {'course_id': course_id.to_deprecated_string(),
-                          'location': descriptor.location.url()}
+                          'location': descriptor.location.to_deprecated_string()}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,

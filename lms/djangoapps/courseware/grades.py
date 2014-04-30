@@ -203,7 +203,7 @@ def _grade(student, request, course, keep_raw_scores):
             # API. If scores exist, we have to calculate grades for this section.
             if not should_grade_section:
                 should_grade_section = any(
-                    descriptor.location.url() in submissions_scores
+                    descriptor.location.to_deprecated_string() in submissions_scores
                     for descriptor in section['xmoduledescriptors']
                 )
 
@@ -424,7 +424,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
     if not user.is_authenticated():
         return (None, None)
 
-    location_url = problem_descriptor.location.url()
+    location_url = problem_descriptor.location.to_deprecated_string()
     if location_url in scores_cache:
         return scores_cache[location_url]
 
