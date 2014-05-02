@@ -83,7 +83,7 @@ def answer_distributions(course_key):
     # dict: { module.module_state_key : (url_name, display_name) }
     state_keys_to_problem_info = {}  # For caching, used by url_and_display_name
 
-    def url_and_display_name(module_state_key):
+    def url_and_display_name(usage_key):
         """
         For a given module_state_key, return the problem's url and display_name.
         Handle modulestore access and caching. This method ignores permissions.
@@ -94,13 +94,12 @@ def answer_distributions(course_key):
                 to this module_state_key.
         """
         problem_store = modulestore()
-        if module_state_key not in state_keys_to_problem_info:
-            location = course_key.make_usage_key_from_deprecated_string(module_state_key)
-            problem = problem_store.get_item(location)
+        if usage_key not in state_keys_to_problem_info:
+            problem = problem_store.get_item(usage_key)
             problem_info = (problem.url_name, problem.display_name_with_default)
-            state_keys_to_problem_info[module_state_key] = problem_info
+            state_keys_to_problem_info[usage_key] = problem_info
 
-        return state_keys_to_problem_info[module_state_key]
+        return state_keys_to_problem_info[usage_key]
 
     # Iterate through all problems submitted for this course in no particular
     # order, and build up our answer_counts dict that we will eventually return
@@ -117,7 +116,7 @@ def answer_distributions(course_key):
             continue
 
         try:
-            url, display_name = url_and_display_name(module.module_state_key)
+            url, display_name = url_and_display_name(module.module_id.map_into_course(course_key))
             # Each problem part has an ID that is derived from the
             # module.module_state_key (with some suffix appended)
             for problem_part_id, raw_answer in raw_answers.items():
