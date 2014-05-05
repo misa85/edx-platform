@@ -31,8 +31,10 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 collection: @options.newComponentCollection
                 el: @$('.add-xblock-component')
                 createComponent: (template) =>
-                    @saveNewComponent(template)
-            )
+                    return @createComponent(template, "Creating new component").done(
+                        (editor) ->
+                            @$newComponentItem.before(editor.$el)
+                    ))
             @addXBlockComponent.render()
 
             @model.on('change:state', @render)
@@ -108,7 +110,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                         $component.after(editor.$el)
                         # Scroll the window so that the new component replaces the old one
                         @setScrollOffset(editor.$el, originalOffset)
-                        ))
+                ))
 
         components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
 
@@ -129,28 +131,28 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             @confirmThenRunOperation(gettext('Delete this component?'),
                 gettext('Deleting this component is permanent and cannot be undone.'),
                 gettext('Yes, delete this component'),
+            ->
+                self.runOperationShowingMessage(gettext('Deleting&hellip;'),
                 ->
-                    self.runOperationShowingMessage(gettext('Deleting&hellip;'),
-                        ->
-                            $component = $(event.currentTarget).parents('.component')
-                            return $.ajax({
-                                type: 'DELETE',
-                                url: self.model.urlRoot + "/" + $component.data('locator')
-                            }).success(=>
-                                analytics.track "Deleted a Component",
-                                    course: course_location_analytics
-                                    unit_id: unit_location_analytics
-                                    id: $component.data('locator')
+                    $component = $(event.currentTarget).parents('.component')
+                    return $.ajax({
+                        type: 'DELETE',
+                        url: self.model.urlRoot + "/" + $component.data('locator')
+                    }).success(=>
+                        analytics.track "Deleted a Component",
+                            course: course_location_analytics
+                            unit_id: unit_location_analytics
+                            id: $component.data('locator')
 
-                                $component.remove()
-                                # b/c we don't vigilantly keep children up to date
-                                # get rid of it before it hurts someone
-                                self.model.save({children: self.components()},
-                                    {
-                                        success: (model) ->
-                                            model.unset('children')
-                                    })
-                            )))
+                        $component.remove()
+                        # b/c we don't vigilantly keep children up to date
+                        # get rid of it before it hurts someone
+                        self.model.save({children: self.components()},
+                            {
+                                success: (model) ->
+                                    model.unset('children')
+                            })
+                    )))
 
         deleteDraft: (event) ->
             @wait(true)
