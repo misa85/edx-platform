@@ -19,11 +19,9 @@ function (HTML5Video, Resizer) {
             handlePlaybackQualityChange: handlePlaybackQualityChange,
             isEnded: isEnded,
             isPlaying: isPlaying,
-            getPlayerState: getPlayerState,
             log: log,
             onCaptionSeek: onSeek,
             onEnded: onEnded,
-            onMuteChange: onMuteChange,
             onPause: onPause,
             onPlay: onPlay,
             onPlaybackQualityChange: onPlaybackQualityChange,
@@ -496,7 +494,7 @@ function (HTML5Video, Resizer) {
             end: false
         });
         this.videoPlayer.ready();
-        this.el.trigger('play', [this.videoPlayer.getPlayerState()]);
+        this.el.trigger('play', arguments);
     }
 
     function onUnstarted() { }
@@ -526,12 +524,8 @@ function (HTML5Video, Resizer) {
             _this.videoPlayer.onSpeedChange(speed);
         });
 
-        this.el.on('volumechange volumechange:silent', function (event, volume) {
+        this.el.on('volumechange', function (event, volume) {
             _this.videoPlayer.onVolumeChange(volume);
-        });
-
-        this.el.on('mute mute:silent', function (event, enable) {
-            _this.videoPlayer.onMuteChange(enable);
         });
 
         this.videoPlayer.log('load_video');
@@ -893,25 +887,6 @@ function (HTML5Video, Resizer) {
 
     function onVolumeChange(volume) {
         this.videoPlayer.player.setVolume(volume);
-    }
-
-    function onMuteChange(muteState) {
-        var action = muteState ? 'mute' : 'unMute';
-
-        console.log(action);
-        this.videoPlayer.player[action]();
-    }
-
-    function getPlayerState() {
-        var player = this.videoPlayer.player;
-
-        return {
-            'position': player.getCurrentTime(),
-            'quality': player.getPlaybackQuality(),
-            'duration': player.getDuration(),
-            'isMuted': player.isMuted(),
-            'volume': player.getVolume(),
-        };
     }
 });
 
