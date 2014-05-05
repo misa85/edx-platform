@@ -8,7 +8,8 @@ from xmodule.modulestore.django import loc_mapper, modulestore
 __all__ = ['edge', 'event', 'landing']
 
 EDITING_TEMPLATES = [
-    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal", "add-xblock-component"
+    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal",
+    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu"
 ]
 
 # points to the temporary course landing page with log in and sign up

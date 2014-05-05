@@ -1,8 +1,8 @@
 /**
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
-define(["jquery", "underscore", "js/views/baseview"],
-    function ($, _, BaseView) {
+define(["jquery", "underscore", "js/views/baseview", "js/views/components/add_xblock_button", "js/views/components/add_xblock_menu"],
+    function ($, _, BaseView, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {
                 'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates',
@@ -17,9 +17,20 @@ define(["jquery", "underscore", "js/views/baseview"],
                 this.template = this.loadTemplate('add-xblock-component');
             },
 
-            render: function() {
+            render: function () {
                 if (!this.$el.html()) {
-                    this.$el.html(this.template({ }));
+                    var that = this;
+                    this.$el.html(this.template({}));
+                    this.collection.each(
+                        function (componentModel) {
+                            var view = new AddXBlockButton({model: componentModel});
+                            that.$el.find('.new-component-type').append(view.render().el);
+
+                            var menu = new AddXBlockMenu({model: componentModel});
+                            that.$el.find('.new-component-menu').append(menu.render().el);
+                        }
+                    );
+
                 }
             },
 

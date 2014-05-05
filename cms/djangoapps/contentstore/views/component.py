@@ -268,6 +268,8 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             subsection=containing_subsection.location.name,
             index=index
         )
+        # TODO: sort by key
+        new_component_collection = component_templates.values()
 
         return render_to_response('unit.html', {
             'context_course': course,
@@ -275,6 +277,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             'unit_locator': locator,
             'locators': locators,
             'component_templates': component_templates,
+            'new_component_collection': json.dumps(new_component_collection),
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
             'subsection': containing_subsection,

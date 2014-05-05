@@ -27,15 +27,11 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         model: @model
       )
 
-      @$('.add-xblock-component').each (index, element) =>
-        component = new AddXBlockComponent
-            el: element
-            createComponent: (template) =>
-                @saveNewComponent(template)
-        component.render()
-
       @addXBlockComponent = new AddXBlockComponent(
+        collection: @options.newComponentCollection
         el: @$('.add-xblock-component')
+        createComponent: (template) =>
+          @saveNewComponent(template)
       )
       @addXBlockComponent.render()
 
