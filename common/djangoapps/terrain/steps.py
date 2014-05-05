@@ -109,7 +109,7 @@ def i_am_not_logged_in(step):
 
 
 @step('I am staff for course "([^"]*)"$')
-def i_am_staff_for_course_by_id(step, course_id):
+def i_am_staff_for_course_by_id(step, course_key):
     world.register_by_course_key(course_key, True)
 
 

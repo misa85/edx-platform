@@ -51,17 +51,17 @@ def register_by_course_key(course_key, username='robot', password='test', is_sta
     if is_staff:
         user.is_staff = True
         user.save()
-    CourseEnrollment.enroll(user, course_id)
+    CourseEnrollment.enroll(user, course_key)
 
 
 @world.absorb
-def enroll_user(user, course_id):
+def enroll_user(user, course_key):
     # Activate user
     registration = world.RegistrationFactory(user=user)
     registration.register(user)
     registration.activate()
     # Enroll them in the course
-    CourseEnrollment.enroll(user, course_id)
+    CourseEnrollment.enroll(user, course_key)
 
 
 @world.absorb
