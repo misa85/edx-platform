@@ -43,7 +43,7 @@ def log_in(username='robot', password='test', email='robot@edx.org', name="Robot
 
 
 @world.absorb
-def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
+def register_by_course_key(course_key, username='robot', password='test', is_staff=False):
     create_user(username, password)
     user = User.objects.get(username=username)
     # Note: this flag makes the user global staff - that is, an edX employee - not a course staff.

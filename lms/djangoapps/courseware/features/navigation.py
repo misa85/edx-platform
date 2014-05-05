@@ -149,7 +149,7 @@ def create_course():
 
 
 def create_user_and_visit_course():
-    world.register_by_course_id(SlashSeparatedCourseKey('edx', '999', 'Test_Course'))
+    world.register_by_course_key(SlashSeparatedCourseKey('edx', '999', 'Test_Course'))
     world.log_in()
     world.visit('/courses/edx/999/Test_Course/courseware/')
 

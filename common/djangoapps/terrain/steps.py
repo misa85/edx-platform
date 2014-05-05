@@ -110,7 +110,7 @@ def i_am_not_logged_in(step):
 
 @step('I am staff for course "([^"]*)"$')
 def i_am_staff_for_course_by_id(step, course_id):
-    world.register_by_course_id(course_id, True)
+    world.register_by_course_key(course_key, True)
 
 
 @step(r'click (?:the|a) link (?:called|with the text) "([^"]*)"$')
