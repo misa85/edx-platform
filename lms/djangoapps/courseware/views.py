@@ -760,7 +760,7 @@ def submission_history(request, course_id, student_username, location):
         )
     except User.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} does not exist.').format(username=student_username)))
-    except (StudentModule.DoesNotExist):  # TODO ugh is this too broad
+    except StudentModule.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
