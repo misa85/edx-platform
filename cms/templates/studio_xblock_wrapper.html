@@ -19,16 +19,12 @@
                             <span class="action-button-text">${_("Edit")}</span>
                         </a>
                     </li>
-                % endif
-                %if settings.FEATURES.get('ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT'):
                     <li class="action-item action-duplicate">
                         <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
                             <i class="icon-copy"></i>
                             <span class="sr">${_("Duplicate")}</span>
                         </a>
                     </li>
-                % endif
-                %if settings.FEATURES.get('ENABLE_DELETE_XBLOCK_LEAF_COMPONENT'):
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
                             <i class="icon-trash"></i>

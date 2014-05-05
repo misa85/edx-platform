@@ -1,8 +1,9 @@
 /**
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
-define(["jquery", "underscore", "js/views/baseview", "js/views/components/add_xblock_button", "js/views/components/add_xblock_menu"],
-    function ($, _, BaseView, AddXBlockButton, AddXBlockMenu) {
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/components/add_xblock_button",
+    "js/views/components/add_xblock_menu"],
+    function ($, _, gettext, BaseView, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {
                 'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates',
@@ -23,10 +24,12 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/components/add_xb
                     this.$el.html(this.template({}));
                     this.collection.each(
                         function (componentModel) {
-                            var view = new AddXBlockButton({model: componentModel});
+                            var view, menu;
+
+                            view = new AddXBlockButton({model: componentModel});
                             that.$el.find('.new-component-type').append(view.render().el);
 
-                            var menu = new AddXBlockMenu({model: componentModel});
+                            menu = new AddXBlockMenu({model: componentModel});
                             that.$el.find('.new-component-menu').append(menu.render().el);
                         }
                     );
@@ -56,8 +59,10 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/components/add_xb
             },
 
             saveNewComponent: function(event) {
-                this.options.createComponent($(event.currentTarget).data());
+                var saveData = $(event.currentTarget).data();
                 this.closeNewComponent(event);
+                this.runOperationShowingMessage(gettext('Saving&hellip;'),
+                    _.bind(this.options.createComponent, this, saveData));
             }
         });
 
