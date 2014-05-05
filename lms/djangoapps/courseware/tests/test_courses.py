@@ -14,7 +14,7 @@ from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
     get_course_by_id, get_cms_course_link, course_image_url,
-    get_course_info_section, get_course_about_section
+    get_course_info_section, get_course_about_section, get_course
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
@@ -26,6 +26,28 @@ CMS_BASE_TEST = 'testcms'
 
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
+
+    def test_get_course_by_id_invalid_chars(self):
+        """
+        Test that `get_course` throws a 404, rather than an exception,
+        when faced with unexpected characters (such as unicode characters,
+        and symbols such as = and ' ')
+        """
+        with self.assertRaises(Http404):
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar' 'statistics=introduction'))
+            get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
+
+    def test_get_course_invalid_chars(self):
+        """
+        Test that `get_course` throws a ValueError, rather than a 404,
+        when faced with unexpected characters (such as unicode characters,
+        and symbols such as = and ' ')
+        """
+        with self.assertRaises(ValueError):
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'statistics=introduction'))
+            get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
 
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
