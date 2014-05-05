@@ -131,6 +131,10 @@ section.instructor-dashboard-content-2 {
   //   border: 1px solid blue;
   // }
 
+  .wrap-instructor-info {
+    display: inline;
+  }
+
   .request-response-error {
     margin: 0;
     padding-bottom: ($baseline);
@@ -164,6 +168,7 @@ section.instructor-dashboard-content-2 {
     @extend .top-header;
     padding-bottom: 0;
     border-bottom: 0;
+    margin-bottom: ($baseline*.75);
   }
 
   input[type="button"] {
@@ -184,20 +189,28 @@ section.instructor-dashboard-content-2 {
   }
 
   .instructor-nav {
-    padding-bottom: 1em;
+    @extend %ui-no-list;
+    border-bottom: 1px solid $gray-l3;
 
-    border-bottom: 1px solid #C8C8C8;
-    a {
-      margin-right: 1.2em;
-    }
+    .nav-item {
+      @extend %t-copy-base;
+      display: inline-block;
+      margin: 0 $baseline ($baseline/2) 0;
 
-    .active-section {
-      color: #551A8B;
+      a {
+        display: block;
+        text-transform: uppercase;
+
+        &.active-section {
+          color: $black;
+        }
+      }
     }
   }
 
   section.idash-section {
     display: none;
+    margin-top: ($baseline*1.5);
     // background-color: #0f0;
 
     &.active-section {
