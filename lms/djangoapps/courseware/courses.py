@@ -118,7 +118,7 @@ def course_image_url(course):
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
         loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-        _path = StaticContent.get_url_path_from_location(loc)
+        _path = loc.to_deprecated_string()
         return _path
 
 
