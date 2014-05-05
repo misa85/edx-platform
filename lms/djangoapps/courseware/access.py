@@ -341,7 +341,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.to_deprecated_string() if isinstance(obj, XBlock) else str(obj)[:60],
+              obj.location.to_deprecated_string() if isinstance(obj, XBlock) else str(obj),
               action)
         return result
 
