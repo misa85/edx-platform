@@ -58,7 +58,8 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                 this.$('.add-xblock-component').each(function(index, element) {
                     var component = new AddXBlockComponent({
                         el: element,
-                        createComponent: _.bind(self.createComponent, self)
+                        createComponent: _.bind(self.createComponent, self),
+                        collection: self.options.newComponentCollection
                     });
                     component.render();
                 });
@@ -102,7 +103,10 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
             },
 
             createComponent: function(template) {
+                var operation = $.Deferred();
                 console.log("Component creation not implemented yet!");
+                operation.reject();
+                return operation.promise();
             },
 
             duplicateComponent: function(xblockElement) {

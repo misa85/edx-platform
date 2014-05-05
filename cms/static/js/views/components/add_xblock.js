@@ -7,9 +7,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
         var AddXBlockComponent = BaseView.extend({
             events: {
                 'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates',
-                'click .new-component .new-component-type a.single-template': 'saveNewComponent',
+                'click .new-component .new-component-type a.single-template': 'createNewComponent',
                 'click .new-component .cancel-button': 'closeNewComponent',
-                'click .new-component-templates .new-component-template a': 'saveNewComponent',
+                'click .new-component-templates .new-component-template a': 'createNewComponent',
                 'click .new-component-templates .cancel-button': 'closeNewComponent'
             },
 
@@ -58,11 +58,19 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
                 this.$('.new-component-item').find('.rendered-component').remove();
             },
 
-            saveNewComponent: function(event) {
-                var saveData = $(event.currentTarget).data();
+            createNewComponent: function(event) {
+                var self = this,
+                    saveData = $(event.currentTarget).data(),
+                    oldOffset = this.getScrollOffset(this.$el);
                 this.closeNewComponent(event);
-                this.runOperationShowingMessage(gettext('Saving&hellip;'),
-                    _.bind(this.options.createComponent, this, saveData));
+                this.runOperationShowingMessage(
+                    gettext('Saving&hellip;'),
+                    _.bind(this.options.createComponent, this, saveData)
+                ).done(function() {
+                    // Restore the scroll position of the buttons so that the new
+                    // component appears above them.
+                    self.setScrollOffset(self.$el, oldOffset);
+                });
             }
         });
 

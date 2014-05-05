@@ -28,7 +28,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
   // tabs
   $('.tab-group').tabs();
 
-  var newComponentCollection = new NewComponentCollection(${new_component_collection | n}, {parse: true});
+  var newComponentCollection = new NewComponentCollection(${component_templates | n}, {parse: true});
 
   new UnitEditView({
     el: $('.main-wrapper'),

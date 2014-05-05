@@ -164,70 +164,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        component_templates = defaultdict(list)
-        for category in COMPONENT_TYPES:
-            component_class = _load_mixed_class(category)
-            # add the default template
-            # TODO: Once mixins are defined per-application, rather than per-runtime,
-            # this should use a cms mixed-in class. (cpennington)
-            if hasattr(component_class, 'display_name'):
-                display_name = component_class.display_name.default or 'Blank'
-            else:
-                display_name = 'Blank'
-            component_templates[category].append((
-                display_name,
-                category,
-                False,  # No defaults have markdown (hardcoded current default)
-                None  # no boilerplate for overrides
-            ))
-            # add boilerplates
-            if hasattr(component_class, 'templates'):
-                for template in component_class.templates():
-                    filter_templates = getattr(component_class, 'filter_templates', None)
-                    if not filter_templates or filter_templates(template, course):
-                        component_templates[category].append((
-                            template['metadata'].get('display_name'),
-                            category,
-                            template['metadata'].get('markdown') is not None,
-                            template.get('template_id')
-                        ))
-
-        # Check if there are any advanced modules specified in the course policy.
-        # These modules should be specified as a list of strings, where the strings
-        # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
-        # enabled for the course.
-        course_advanced_keys = course.advanced_modules
-
-        # Set component types according to course policy file
-        if isinstance(course_advanced_keys, list):
-            for category in course_advanced_keys:
-                if category in ADVANCED_COMPONENT_TYPES:
-                    # Do I need to allow for boilerplates or just defaults on the
-                    # class? i.e., can an advanced have more than one entry in the
-                    # menu? one for default and others for prefilled boilerplates?
-                    try:
-                        component_class = _load_mixed_class(category)
-
-                        component_templates['advanced'].append(
-                            (
-                                component_class.display_name.default or category,
-                                category,
-                                False,
-                                None  # don't override default data
-                            )
-                        )
-                    except PluginMissingError:
-                        # dhm: I got this once but it can happen any time the
-                        # course author configures an advanced component which does
-                        # not exist on the server. This code here merely
-                        # prevents any authors from trying to instantiate the
-                        # non-existent component type by not showing it in the menu
-                        pass
-        else:
-            log.error(
-                "Improper format for course advanced keys! %s",
-                course_advanced_keys
-            )
+        component_templates = _get_component_templates(course)
 
         xblocks = item.get_children()
         locators = [
@@ -268,16 +205,13 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             subsection=containing_subsection.location.name,
             index=index
         )
-        # TODO: sort by key
-        new_component_collection = component_templates.values()
 
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
             'unit_locator': locator,
             'locators': locators,
-            'component_templates': component_templates,
-            'new_component_collection': json.dumps(new_component_collection),
+            'component_templates': json.dumps(component_templates),
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
             'subsection': containing_subsection,
@@ -315,6 +249,7 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
+        component_templates = _get_component_templates(course)
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
         while parent and parent.category != 'sequential':
@@ -332,9 +267,83 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
             'unit': unit,
             'unit_publish_state': unit_publish_state,
             'ancestor_xblocks': ancestor_xblocks,
+            'component_templates': json.dumps(component_templates),
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")
+
+def _get_component_templates(course):
+    """
+    Returns the applicaple component templates that can be used by the specified course.
+    """
+    component_templates = defaultdict(list)
+    for category in COMPONENT_TYPES:
+        component_class = _load_mixed_class(category)
+        # add the default template
+        # TODO: Once mixins are defined per-application, rather than per-runtime,
+        # this should use a cms mixed-in class. (cpennington)
+        if hasattr(component_class, 'display_name'):
+            display_name = component_class.display_name.default or 'Blank'
+        else:
+            display_name = 'Blank'
+        component_templates[category].append((
+            display_name,
+            category,
+            False,  # No defaults have markdown (hardcoded current default)
+            None  # no boilerplate for overrides
+        ))
+        # add boilerplates
+        if hasattr(component_class, 'templates'):
+            for template in component_class.templates():
+                filter_templates = getattr(component_class, 'filter_templates', None)
+                if not filter_templates or filter_templates(template, course):
+                    component_templates[category].append((
+                        template['metadata'].get('display_name'),
+                        category,
+                        template['metadata'].get('markdown') is not None,
+                        template.get('template_id')
+                    ))
+
+    # Check if there are any advanced modules specified in the course policy.
+    # These modules should be specified as a list of strings, where the strings
+    # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
+    # enabled for the course.
+    course_advanced_keys = course.advanced_modules
+
+    # Set component types according to course policy file
+    if isinstance(course_advanced_keys, list):
+        for category in course_advanced_keys:
+            if category in ADVANCED_COMPONENT_TYPES:
+                # Do I need to allow for boilerplates or just defaults on the
+                # class? i.e., can an advanced have more than one entry in the
+                # menu? one for default and others for prefilled boilerplates?
+                try:
+                    component_class = _load_mixed_class(category)
+
+                    component_templates['advanced'].append(
+                        (
+                            component_class.display_name.default or category,
+                            category,
+                            False,
+                            None  # don't override default data
+                        )
+                    )
+                except PluginMissingError:
+                    # dhm: I got this once but it can happen any time the
+                    # course author configures an advanced component which does
+                    # not exist on the server. This code here merely
+                    # prevents any authors from trying to instantiate the
+                    # non-existent component type by not showing it in the menu
+                    pass
+    else:
+        log.error(
+            "Improper format for course advanced keys! %s",
+            course_advanced_keys
+        )
+
+    # TODO: sort by key
+    return component_templates.values()
+
 
 
 @login_required
