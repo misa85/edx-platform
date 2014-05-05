@@ -94,7 +94,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         #self.item_module = self.item_descriptor.xmodule_runtime.xmodule_instance
         #self.item_module is None at this time
 
-        self.item_url = str(self.item_descriptor.location.to_deprecated_string())
+        self.item_url = self.item_descriptor.location.to_deprecated_string()
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)

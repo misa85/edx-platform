@@ -85,13 +85,13 @@ def answer_distributions(course_key):
 
     def url_and_display_name(usage_key):
         """
-        For a given module_state_key, return the problem's url and display_name.
+        For a given usage_key, return the problem's url and display_name.
         Handle modulestore access and caching. This method ignores permissions.
 
         Raises:
-            InvalidKeyError: if the module_state_key does not parse
+            InvalidKeyError: if the usage_key does not parse
             ItemNotFoundError: if there is no content that corresponds
-                to this module_state_key.
+                to this usage_key.
         """
         problem_store = modulestore()
         if usage_key not in state_keys_to_problem_info:

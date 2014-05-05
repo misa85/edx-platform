@@ -35,7 +35,9 @@ class CoursesTest(ModuleStoreTestCase):
         """
         with self.assertRaises(Http404):
             get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+        with self.assertRaises(Http404):
             get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar' 'statistics=introduction'))
+        with self.assertRaises(Http404):
             get_course_by_id(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
 
     def test_get_course_invalid_chars(self):
@@ -46,7 +48,9 @@ class CoursesTest(ModuleStoreTestCase):
         """
         with self.assertRaises(ValueError):
             get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'business and management'))
+        with self.assertRaises(ValueError):
             get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'statistics=introduction'))
+        with self.assertRaises(ValueError):
             get_course(SlashSeparatedCourseKey('MITx', 'foobar', 'NiñøJoséMaríáßç'))
 
     @override_settings(
