@@ -10,12 +10,6 @@ The VitalSource Online Bookshelf e-reader tool provides your students with easy 
    :width: 500
    :alt: VitalSource e-book with highlighted note
 
-The VitalSource e-reader opens in a new browser page. You'll create a link to the e-reader in a unit in your course. 
-
-.. image:: /Images/VitalSource_LMS.png
-   :width: 500
-   :alt: Student view of a unit that contains a VitalSource component
-
 **************************
 Add a VitalSource E-Reader
 **************************
@@ -59,7 +53,7 @@ In this step, you'll add values to the **advanced_modules** and **lti_passports*
 
    **Note** If the **Policy Value** field already contains text, place your cursor directly after the closing quotation mark for the final item, and then enter a comma followed by ``“lti”`` (make sure that you include the quotation marks). For example, the text in the **Policy Value** field may resemble the following:
 
-   ``"value_1","lti"``
+   ``["value_1","lti"]``
 
 4. Scroll down to the **lti_passports** policy key.
 
@@ -73,7 +67,7 @@ The page refreshes automatically. At the top of the page, you see a notification
 Step 3. Add the VitalSource E-Reader to a Unit
 ==============================================
 
-To add the VitalSource e-reader to a unit, you'll create an LTI component, and then configure the component.
+To add the VitalSource e-reader to a unit, you'll create an LTI component, and then configure a few settings in the component.
 
 #. In the unit where you want to create the problem, click **Advanced** under **Add New Component**, and then click **LTI**.
 
