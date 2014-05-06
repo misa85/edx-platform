@@ -28,6 +28,16 @@ define(["backbone"], function (Backbone) {
                     this.type = component_instance[1];
                 }
             }
+            // Sort the templates.
+            this.templates.sort(function (a, b) {
+                // The entry without a boilerplate always goes first
+                if (!a.boilerplate_name || (a.display_name < b.display_name)) {
+                    return -1;
+                }
+                else {
+                    return (a.display_name > b.display_name) ? 1 : 0;
+                }
+            });
         }
     });
 });
