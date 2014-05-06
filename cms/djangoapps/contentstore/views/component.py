@@ -272,12 +272,16 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
     else:
         return HttpResponseBadRequest("Only supports html requests")
 
+
 def _get_component_templates(course):
     """
-    Returns the applicaple component templates that can be used by the specified course.
+    Returns the applicable component templates that can be used by the specified course.
     """
-    component_templates = defaultdict(list)
+    component_templates = []
+    # The component_templates array is in the order of "advanced" (if present), followed
+    # by the components in the order listed in COMPONENT_TYPES.
     for category in COMPONENT_TYPES:
+        templates_for_category = []
         component_class = _load_mixed_class(category)
         # add the default template
         # TODO: Once mixins are defined per-application, rather than per-runtime,
@@ -286,7 +290,7 @@ def _get_component_templates(course):
             display_name = component_class.display_name.default or 'Blank'
         else:
             display_name = 'Blank'
-        component_templates[category].append((
+        templates_for_category.append((
             display_name,
             category,
             False,  # No defaults have markdown (hardcoded current default)
@@ -297,12 +301,13 @@ def _get_component_templates(course):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, course):
-                    component_templates[category].append((
+                    templates_for_category.append((
                         template['metadata'].get('display_name'),
                         category,
                         template['metadata'].get('markdown') is not None,
                         template.get('template_id')
                     ))
+        component_templates.append(templates_for_category)
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
@@ -320,7 +325,7 @@ def _get_component_templates(course):
                 try:
                     component_class = _load_mixed_class(category)
 
-                    component_templates['advanced'].append(
+                    component_templates.insert(0,
                         (
                             component_class.display_name.default or category,
                             category,
@@ -341,9 +346,7 @@ def _get_component_templates(course):
             course_advanced_keys
         )
 
-    # TODO: sort by key
-    return component_templates.values()
-
+    return component_templates
 
 
 @login_required

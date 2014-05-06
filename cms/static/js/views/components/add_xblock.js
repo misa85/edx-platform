@@ -33,7 +33,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
                             that.$el.find('.new-component-menu').append(menu.render().el);
                         }
                     );
-
                 }
             },
 
