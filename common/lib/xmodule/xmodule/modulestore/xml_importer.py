@@ -184,7 +184,8 @@ def import_from_xml(
                     courses = store.get_courses()
                     bad_run = False
                     for course in courses:
-                        if course.location.course_id.startswith(course_prefix):
+                        if course.location.course_id.startswith(course_prefix) \
+                        and course_location.course == course.location.course:
                             log.debug('Import is overwriting existing course')
                             # Importing over existing course, check
                             # that runs match or fail
