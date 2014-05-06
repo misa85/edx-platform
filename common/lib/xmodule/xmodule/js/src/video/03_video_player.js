@@ -524,7 +524,7 @@ function (HTML5Video, Resizer) {
             _this.videoPlayer.onSpeedChange(speed);
         });
 
-        this.el.on('volumechange', function (event, volume) {
+        this.el.on('volumechange volumechange:silent', function (event, volume) {
             _this.videoPlayer.onVolumeChange(volume);
         });
 
