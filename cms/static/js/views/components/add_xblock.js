@@ -30,7 +30,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
                             that.$el.find('.new-component-type').append(view.render().el);
 
                             menu = new AddXBlockMenu({model: componentModel});
-                            that.$el.find('.new-component-menu').append(menu.render().el);
+                            that.$el.append(menu.render().el);
                         }
                     );
                 }

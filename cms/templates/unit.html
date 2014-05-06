@@ -25,9 +25,6 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
     function(doc, $, ModuleModel, UnitEditView, NewComponentCollection) {
   window.unit_location_analytics = '${unit_locator}';
 
-  // tabs
-  $('.tab-group').tabs();
-
   var newComponentCollection = new NewComponentCollection(${component_templates | n}, {parse: true});
 
   new UnitEditView({
