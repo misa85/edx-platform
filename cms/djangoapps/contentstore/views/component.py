@@ -290,24 +290,24 @@ def _get_component_templates(course):
             display_name = component_class.display_name.default or 'Blank'
         else:
             display_name = 'Blank'
-        templates_for_category.append((
-            display_name,
-            category,
-            False,  # No defaults have markdown (hardcoded current default)
-            None  # no boilerplate for overrides
-        ))
+        templates_for_category.append({
+            "display_name": display_name,
+            "category": category,
+            "is_common": False,  # No defaults have markdown (hardcoded current default)
+            "boilerplate_name": None  # no boilerplate for overrides
+        })
         # add boilerplates
         if hasattr(component_class, 'templates'):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, course):
-                    templates_for_category.append((
-                        template['metadata'].get('display_name'),
-                        category,
-                        template['metadata'].get('markdown') is not None,
-                        template.get('template_id')
-                    ))
-        component_templates.append(templates_for_category)
+                    templates_for_category.append({
+                        "display_name": template['metadata'].get('display_name'),
+                        "category": category,
+                        "is_common": template['metadata'].get('markdown') is not None,
+                        "boilerplate_name": template.get('template_id')
+                    })
+        component_templates.append({"type": category, "templates": templates_for_category})
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
@@ -315,6 +315,7 @@ def _get_component_templates(course):
     # enabled for the course.
     course_advanced_keys = course.advanced_modules
 
+    advanced_component_templates = {"type": "advanced", "templates": []}
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
@@ -325,13 +326,13 @@ def _get_component_templates(course):
                 try:
                     component_class = _load_mixed_class(category)
 
-                    component_templates.insert(0,
-                        (
-                            component_class.display_name.default or category,
-                            category,
-                            False,
-                            None  # don't override default data
-                        )
+                    advanced_component_templates['templates'].append(
+                        {
+                            "display_name": component_class.display_name.default or category,
+                            "category": category,
+                            "is_common": False,
+                            "boilerplate_name": None  # don't override default data
+                        }
                     )
                 except PluginMissingError:
                     # dhm: I got this once but it can happen any time the
@@ -345,6 +346,8 @@ def _get_component_templates(course):
             "Improper format for course advanced keys! %s",
             course_advanced_keys
         )
+    if len(advanced_component_templates['templates']) > 0:
+        component_templates.insert(0, advanced_component_templates)
 
     return component_templates
 

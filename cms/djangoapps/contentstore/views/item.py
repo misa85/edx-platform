@@ -411,7 +411,7 @@ def _create_item(request):
     metadata = {}
     data = None
     template_id = request.json.get('boilerplate')
-    if template_id is not None:
+    if template_id is not None and len(template_id) > 0:
         clz = parent.runtime.load_block_type(category)
         if clz is not None:
             template = clz.get_template(template_id)
