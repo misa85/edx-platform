@@ -42,8 +42,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                     success: function(xblock) {
                         if (xblockView.hasChildXBlocks()) {
                             xblockView.$el.removeClass('is-hidden');
-                            self.addButtonActions(xblockView.$el);
-                            self.renderAddXBlockComponents();
+                            self.onXBlockRefresh(xblockView);
                         } else {
                             noContentElement.removeClass('is-hidden');
                         }
@@ -51,6 +50,19 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                         self.delegateEvents();
                     }
                 });
+            },
+
+            findXBlockElement: function(target) {
+                return $(target).closest('[data-locator]');
+            },
+
+            getURLRoot: function() {
+                return this.xblockView.model.urlRoot;
+            },
+
+            onXBlockRefresh: function(xblockView) {
+                this.addButtonActions(xblockView.$el);
+                this.renderAddXBlockComponents();
             },
 
             renderAddXBlockComponents: function() {
@@ -63,14 +75,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                     });
                     component.render();
                 });
-            },
-
-            findXBlockElement: function(target) {
-                return $(target).closest('[data-locator]');
-            },
-
-            getURLRoot: function() {
-                return this.xblockView.model.urlRoot;
             },
 
             addButtonActions: function(element) {
@@ -102,11 +106,28 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                 });
             },
 
-            createComponent: function(template) {
-                var operation = $.Deferred();
-                console.log("Component creation not implemented yet!");
-                operation.reject();
-                return operation.promise();
+            createComponent: function(template, target) {
+                var self = this, parentElement, parentLocator, operation, xblockInfo, view;
+                parentElement = this.findXBlockElement(target);
+                parentLocator = parentElement.data('locator');
+                xblockInfo = new XBlockInfo({
+                    category: template.category
+                });
+                view = new XBlockView({
+                    model: xblockInfo,
+                    view: this.view
+                });
+                operation = view.create(template, parentLocator);
+                operation.done(function() {
+                    /*
+                     var buttonPanel = parentElement.find('.add-xblock-component');
+                     buttonPanel.before(view.$el);
+                     view.render();
+                     */
+                    // Refresh the entire parent so that its new child is shown
+                    self.refreshXBlockElement(parentElement);
+                });
+                return operation;
             },
 
             duplicateComponent: function(xblockElement) {
@@ -185,7 +206,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                 temporaryView.render({
                     success: function() {
                         temporaryView.unbind();  // Remove the temporary view
-                        self.addButtonActions(xblockElement);
+                        self.onXBlockRefresh(temporaryView);
                     }
                 });
             }

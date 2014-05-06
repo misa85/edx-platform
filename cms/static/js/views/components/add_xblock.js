@@ -59,12 +59,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
 
             createNewComponent: function(event) {
                 var self = this,
-                    saveData = $(event.currentTarget).data(),
+                    element = $(event.currentTarget),
+                    saveData = element.data(),
                     oldOffset = this.getScrollOffset(this.$el);
                 this.closeNewComponent(event);
                 this.runOperationShowingMessage(
-                    gettext('Saving&hellip;'),
-                    _.bind(this.options.createComponent, this, saveData)
+                    gettext('Saving&hellip;'), _.bind(this.options.createComponent, this, saveData, element)
                 ).done(function() {
                     // Restore the scroll position of the buttons so that the new
                     // component appears above them.
