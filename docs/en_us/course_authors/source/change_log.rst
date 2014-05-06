@@ -12,6 +12,8 @@ May, 2014
 
    * - Date
      - Change
+   * - 05/06/14
+     - Add :ref:`VitalSource` topic
    * - 05/02/14
      - Updated :ref:`Drag and Drop` information
 
