@@ -29,13 +29,18 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         In [212]: 1.9e24 - 1.9*10**24
         Out[212]: 268435456.0
     """
+    if isinstance(tolerance, str):
+        if tolerance == default_tolerance:
+            relative_tolerance = True
+        if tolerance.endswith('%'):
+            tolerance = evaluator(dict(), dict(), tolerance[:-1]) * 0.01
+            if not relative_tolerance:
+                tolerance = tolerance * abs(instructor_complex)
+        else:
+            tolerance = evaluator(dict(), dict(), tolerance)
+
     if relative_tolerance:
-        tolerance = tolerance * abs(instructor_complex)
-    elif tolerance.endswith('%'):
-        tolerance = evaluator(dict(), dict(), tolerance[:-1]) * 0.01
-        tolerance = tolerance * abs(instructor_complex)
-    else:
-        tolerance = evaluator(dict(), dict(), tolerance)
+        tolerance = tolerance * max(abs(student_complex), abs(instructor_complex))
 
     if isinf(student_complex) or isinf(instructor_complex):
         # If an input is infinite, we can end up with `abs(student_complex-instructor_complex)` and
