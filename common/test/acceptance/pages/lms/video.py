@@ -162,30 +162,32 @@ class VideoPage(PageObject):
         return self.q(css=VIDEO_BUTTONS[button_id]).visible
 
     @wait_for_js
-    def show_captions(self):
+    def show_captions(self, captions_new_state):
         """
-        Show the video captions.
+        Set the video captions visibility state.
+        :param captions_new_state (bool): True means show captions, False means hide captions
         """
+        states = {True: 'Shown', False: 'Hidden'}
+        sate = states[captions_new_state]
 
-        def _is_subtitles_open():
+        def _captions_current_state():
             """
-            Check if subtitles are opened
-            :return: bool
+            Get current visibility sate of captions.
+            :return bool: True means captions are visible, False means captions are not visible
             """
-            is_open = not self.q(css=CSS_CLASS_NAMES['closed_captions']).present
-            return is_open
+            return not self.q(css=CSS_CLASS_NAMES['closed_captions']).present
 
         # Make sure that the CC button is there
         EmptyPromise(lambda: self.is_button_shown('CC'),
                      "CC button is shown").fulfill()
 
-        # Check if the captions are already open and click if not
-        if _is_subtitles_open() is False:
-            self.q(css=VIDEO_BUTTONS['CC']).first.click()
+        # toggle captions visibility state if needed
+        if _captions_current_state() != captions_new_state:
+            self.click_player_button('CC')
 
-        # Verify that they are now open
-        EmptyPromise(_is_subtitles_open,
-                     "Subtitles are shown").fulfill()
+            # Verify that captions state is toggled/changed
+            EmptyPromise(lambda: _captions_current_state() == captions_new_state,
+                         "Captions are {state}".format(sate)).fulfill()
 
     @property
     def captions_text(self):
@@ -358,3 +360,11 @@ class VideoPage(PageObject):
 
         # wait until captions rendered completely
         self._wait_for_element(CSS_CLASS_NAMES['captions_rendered'], 'Captions Rendered')
+
+    @property
+    def sources(self):
+        """
+        Extract all video source urls on current page.
+        """
+        selector = CSS_CLASS_NAMES['video_sources']
+        return self.q(css=selector).map(lambda el: el.get_attribute('src').split('?')[0]).results

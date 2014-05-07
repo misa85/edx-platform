@@ -257,7 +257,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.metadata = self.metadata_for_mode('youtube', data)
         self.assets.append('chinese_transcripts.srt')
         self.navigate_to_video()
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # Verify that we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
@@ -273,7 +273,7 @@ class YouTubeVideoTest(VideoBaseTest):
         """
         self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
         self.navigate_to_video()
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # Verify that we see "Hi, welcome to Edx." text in the captions
         self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
@@ -374,7 +374,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # make sure captions are opened
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # click video button "fullscreen"
         self.video.click_player_button('fullscreen')
@@ -436,6 +436,40 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.assertTrue(self.video.is_video_rendered('html5'))
+
+    def test_video_language_menu_working(self):
+        """
+        Scenario: Language menu works correctly in Video component
+        Given
+        I have a "chinese_transcripts.srt" transcript file in assets
+        And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+        And it has a video in "Youtube" mode
+        And I make sure captions are closed
+        And I see video menu "language" with correct items
+        And I select language with code "zh"
+        Then I see "好 各位同学" text in the captions
+        And I select language with code "en"
+        And I see "Hi, welcome to Edx." text in the captions
+        """
+
+        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
+        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        self.video.show_captions(False)
+
+        self.video.select_language('zh')
+
+        # TODO(muhammad-ammar) And I see video menu "language" with correct items
+
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        self.video.select_language('en')
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
 
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
@@ -573,7 +607,7 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # make sure captions are opened
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # click video button "fullscreen"
         self.video.click_player_button('fullscreen')
@@ -597,7 +631,7 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # make sure captions are opened
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # check if we see "Hi, welcome to Edx." text in the captions
         self.assertIn("Hi, welcome to Edx.", self.video.captions_text)
@@ -618,8 +652,23 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # make sure captions are opened
-        self.video.show_captions()
+        self.video.show_captions(True)
 
         # check if we see "好 各位同学" text in the captions
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
+
+    def test_video_rendering(self):
+        """
+        Scenario: Video component is fully rendered in the LMS in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        When the video has rendered in "HTML5" mode
+        And rendered video source is correct
+        """
+        self.metadata = self.metadata_for_mode('html5')
+
+        self.navigate_to_video()
+
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+        self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
