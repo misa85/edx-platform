@@ -10,6 +10,7 @@ verify_student/start?course_id=MITx/6.002x/2013_Spring # create
  ---> To Payment
 
 """
+from django.http import HttpResponseRedirect
 import json
 import mock
 import urllib
@@ -78,6 +79,31 @@ class TestVerifyView(TestCase):
         response = self.client.get(url)
 
         self.assertEquals(response.status_code, 302)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestVerifiedView(TestCase):
+    """
+    Test VerifiedView when there is no active verified mode for course.
+    """
+    def setUp(self):
+        self.user = UserFactory.create(username="abc", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_id = "MITx/999.1x/Verified_Course"
+        self.course = CourseFactory.create(org='MITx', number='999.1x', display_name='Verified Course')
+
+    def test_verified_course_mode_none(self):
+        url = reverse('verify_student_verified', kwargs={"course_id": self.course_id})
+
+        verify_mode = CourseMode.mode_for_course(self.course_id, "verified")
+        # Verify mode should be None.
+        self.assertEquals(verify_mode, None)
+
+        response = self.client.get(url)
+        # Status code should be 302
+        self.assertEquals(response.status_code, 302)
+        # Response object should be instance of HttpResponseRedirect.
+        self.assertTrue(isinstance(response, HttpResponseRedirect))
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
