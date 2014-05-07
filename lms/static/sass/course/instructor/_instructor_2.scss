@@ -133,6 +133,7 @@ section.instructor-dashboard-content-2 {
 
   .wrap-instructor-info {
     display: inline;
+    top: 0;
   }
 
   .request-response-error {
@@ -166,6 +167,7 @@ section.instructor-dashboard-content-2 {
 
   h1 {
     @extend .top-header;
+    display: inline-block;
     padding-bottom: 0;
     border-bottom: 0;
     margin-bottom: ($baseline*.75);
@@ -190,12 +192,13 @@ section.instructor-dashboard-content-2 {
 
   .instructor-nav {
     @extend %ui-no-list;
+    border-top: 1px solid $gray-l3;
     border-bottom: 1px solid $gray-l3;
 
     .nav-item {
       @extend %t-copy-base;
       display: inline-block;
-      margin: 0 $baseline ($baseline/2) 0;
+      margin: ($baseline/2) $baseline;
 
       a {
         display: block;
