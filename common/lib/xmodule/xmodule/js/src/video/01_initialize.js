@@ -276,10 +276,24 @@ function (VideoPlayer, VideoStorage) {
         return false;
     }
 
+    function _supportsHTML5Video() {
+        return !!document.createElement('video').canPlayType;
+    }
+
     // function _prepareHTML5Video(state)
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
     function _prepareHTML5Video(state) {
+
+        if (!_supportsHTML5Video()) {
+            state.el.find('.video-player div').addClass('hidden');
+            state.el.find('.video-player h3').first().removeClass('hidden');
+
+            console.log('[Video info]: HTML5 Video API is not supported.');
+
+            return false;
+        }
+
         state.parseVideoSources(
             {
                 mp4: state.config.mp4Source,
@@ -300,7 +314,7 @@ function (VideoPlayer, VideoStorage) {
 
             // TODO: use 1 class to work with.
             state.el.find('.video-player div').addClass('hidden');
-            state.el.find('.video-player h3').removeClass('hidden');
+            state.el.find('.video-player h3').last().removeClass('hidden');
 
             console.log(
                 '[Video info]: Non-youtube video sources aren\'t available.'
