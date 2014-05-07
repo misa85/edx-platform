@@ -71,7 +71,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
-                        collection: self.options.newComponentCollection
+                        collection: self.options.templates
                     });
                     component.render();
                 });

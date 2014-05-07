@@ -28,7 +28,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
             )
 
             @addXBlockComponent = new AddXBlockComponent(
-                collection: @options.newComponentCollection
+                collection: @options.templates
                 el: @$('.add-xblock-component')
                 createComponent: (template) =>
                     return @createComponent(template, "Creating new component").done(

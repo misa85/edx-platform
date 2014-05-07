@@ -1,7 +1,7 @@
 define(["jquery", "coffee/src/views/unit", "js/models/module_info", "js/views/feedback_notification",
-    "js/collections/new_component", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers",
+    "js/collections/component_template", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers",
     "jasmine-stealth"],
-    function ($, UnitEditView, ModuleModel, NotificationView, NewComponentCollection,
+    function ($, UnitEditView, ModuleModel, NotificationView, ComponentTemplates,
               create_sinon, view_helpers) {
         var requests, unit, initialize, respondWithHtml, verifyJSON, verifyComponents, i;
 
@@ -19,7 +19,7 @@ define(["jquery", "coffee/src/views/unit", "js/models/module_info", "js/views/fe
             requests = create_sinon.requests(test);
             unit = new UnitEditView({
                 el: $('.main-wrapper'),
-                newComponentCollection: new NewComponentCollection([
+                componentTemplates: new ComponentTemplates([
                     [["Discussion", "discussion", false, null]]
                 ], {parse: true}),
                 model: new ModuleModel({
