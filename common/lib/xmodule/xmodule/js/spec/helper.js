@@ -202,6 +202,11 @@
             },
             toBeInArray: function (array) {
                 return $.inArray(this.actual, array) > -1;
+            },
+            toBeEventBinded: function (eventName) {
+                spyOnEvent(this.actual, eventName);
+                this.actual.trigger(eventName);
+                expect(eventName).toHaveBeenTriggeredOn(this.actual);
             }
         });
 

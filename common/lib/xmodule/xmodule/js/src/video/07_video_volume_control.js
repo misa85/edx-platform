@@ -45,6 +45,7 @@ function() {
             this.a11y = new Accessibility(
                 this.button, this.min, this.max, this.i18n
             );
+            this.volume = this.storedVolume = this.max;
 
             this.render();
             this.bindHandlers();
@@ -136,34 +137,28 @@ function() {
 
         /* Mute button related methods */
         mute: function(muteStatus, silent) {
-            if (muteStatus === this.getMuteStatus()) {
-                return false;
-            }
-
             var volume;
-            this.isMuted = muteStatus;
-            this.updateMuteButtonView(this.getMuteStatus());
 
-            if (this.getMuteStatus()) {
+            this.updateMuteButtonView(muteStatus);
+
+            if (muteStatus) {
                 this.storedVolume = this.getVolume() || this.max;
-                volume = 0;
-            } else {
-                volume = this.storedVolume;
             }
 
             if (!silent) {
+                volume = muteStatus ? 0 : this.storedVolume;
                 this.setVolume(volume, false, false);
             }
         },
 
         getMuteStatus: function () {
-            return this.isMuted;
+            return this.volume === 0;
         },
 
         updateMuteButtonView: function(isMuted) {
             var action = isMuted ? 'addClass' : 'removeClass';
-            // @TODO FIX class name
-            this.el[action]('muted');
+
+            this.el[action]('is-muted');
         },
 
         toggleMute: function() {
@@ -172,23 +167,21 @@ function() {
 
         checkMuteButtonStatus: function (volume) {
             if (volume <= this.min) {
-                this.mute(true, true);
-                this.state.el.off('volumechange.muted');
-                this.state.el.on('volumechange.muted', _.once(function () {
-                    this.mute(false, true);
+                this.updateMuteButtonView(true);
+                this.state.el.off('volumechange.is-muted');
+                this.state.el.on('volumechange.is-muted', _.once(function () {
+                     this.updateMuteButtonView(false);
                 }.bind(this)));
             }
         },
 
         /* Event handlers */
         openMenu: function() {
-            // @TODO move to closeMenu, FIX class name
-            this.el.addClass('open');
+            this.el.addClass('is-opened');
         },
 
         closeMenu: function() {
-            // @TODO move to closeMenu, FIX class name
-            this.el.removeClass('open');
+            this.el.removeClass('is-opened');
         },
 
         keyDownHandler: function(event) {
@@ -287,7 +280,7 @@ function() {
         },
 
         update: function(volume) {
-            this.liveRegion.html([
+            this.liveRegion.text([
                 this.getVolumeDescription(volume),
                 this.i18n['Volume'] + '.',
             ].join(' '));
