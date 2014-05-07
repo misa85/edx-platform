@@ -64,8 +64,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/compon
                     oldOffset = this.getScrollOffset(this.$el);
                 this.closeNewComponent(event);
                 this.runOperationShowingMessage(
-                    gettext('Saving&hellip;'), _.bind(this.options.createComponent, this, saveData, element)
-                ).done(function() {
+                    gettext('Adding&hellip;'),
+                    _.bind(this.options.createComponent, this, saveData, element)
+                ).always(function() {
                     // Restore the scroll position of the buttons so that the new
                     // component appears above them.
                     self.setScrollOffset(self.$el, oldOffset);

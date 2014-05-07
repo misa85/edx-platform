@@ -301,7 +301,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         renderContainerPage(ABTestFixture, this);
                         deleteComponent(0, 500);
                         expectComponents(getGroupElement(), allComponentsInGroup);
-                        expect(notificationSpies.hide).not.toHaveBeenCalled();
                     });
                 });
 
@@ -382,7 +381,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         renderContainerPage(ABTestFixture, this);
                         duplicateComponentWithResponse(0, 500);
                         expectComponents(getGroupElement(), allComponentsInGroup);
-                        expect(notificationSpies.hide).not.toHaveBeenCalled();
                         expect(refreshXBlockSpies).not.toHaveBeenCalled();
                     });
                 });

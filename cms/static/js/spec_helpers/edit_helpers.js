@@ -5,17 +5,8 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
     "js/views/modals/edit_xblock", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function($, _, create_sinon, modal_helpers, EditXBlockModal) {
 
-        var editorTemplate = readFixtures('metadata-editor.underscore'),
-            numberEntryTemplate = readFixtures('metadata-number-entry.underscore'),
-            stringEntryTemplate = readFixtures('metadata-string-entry.underscore'),
-            editXBlockModalTemplate = readFixtures('edit-xblock-modal.underscore'),
-            editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
-            installMockXBlock,
-            uninstallMockXBlock,
-            installMockXModule,
-            uninstallMockXModule,
-            installEditTemplates,
-            showEditModal;
+        var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
+            installEditTemplates, showEditModal;
 
         installMockXBlock = function(mockResult) {
             window.MockXBlock = function(runtime, element) {
@@ -45,13 +36,13 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
             modal_helpers.installModalTemplates(append);
 
             // Add templates needed by the edit XBlock modal
-            appendSetFixtures($("<script>", { id: "edit-xblock-modal-tpl", type: "text/template" }).text(editXBlockModalTemplate));
-            appendSetFixtures($("<script>", { id: "editor-mode-button-tpl", type: "text/template" }).text(editorModeButtonTemplate));
+            modal_helpers.installTemplate('edit-xblock-modal');
+            modal_helpers.installTemplate('editor-mode-button');
 
             // Add templates needed by the settings editor
-            appendSetFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate));
-            appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate));
-            appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate));
+            modal_helpers.installTemplate('metadata-editor');
+            modal_helpers.installTemplate('metadata-number-entry');
+            modal_helpers.installTemplate('metadata-string-entry');
         };
 
         showEditModal = function(requests, xblockElement, model, mockHtml, options) {

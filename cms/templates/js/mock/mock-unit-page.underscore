@@ -1,0 +1,25 @@
+<div id="content">
+
+    <div class="main-wrapper edit-state-draft" data-locator="unit_locator">
+        <div class="inner-wrapper">
+            <div class="alert editing-draft-alert">
+                <p class="alert-message"><strong>You are editing a draft.</strong></p>
+                <a href="#" target="_blank" class="alert-action secondary">View the Live Version</a>
+            </div>
+
+            <div class="main-column">
+                <article class="unit-body window">
+                    <p class="unit-name-input"><label for="unit-display-name-input">Display Name:</label><input type="text" value="Mock Unit" id="unit-display-name-input" class="unit-display-name-input"></p>
+                    <ol class="components ui-sortable">
+                        <li class="component" data-locator="loc_1"></li>
+                        <li class="add-xblock-component new-component-item adding"></li>
+                    </ol>
+                </article>
+            </div>
+
+            <div class="sidebar">
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -119,6 +119,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification",
                 });
                 operation = view.create(template, parentLocator);
                 operation.done(function() {
+                    // TODO: can we refresh just the new component?
                     /*
                      var buttonPanel = parentElement.find('.add-xblock-component');
                      buttonPanel.before(view.$el);
